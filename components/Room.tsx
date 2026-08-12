@@ -111,16 +111,26 @@ export default function Room() {
       <Chrome now={now} utsav={utsav} />
 
       <div className="title">
-        <h1 className="title__mark">
-          गणपती बाप्पा <span>मोरया</span>
+        <h1 className="title__lockup">
+          <span className="title__en">Ganpati Bappa Morya</span>
+          <span className="title__rule" aria-hidden />
+          <span className="title__mr" lang="mr">
+            गणपती बाप्पा मोरया
+          </span>
         </h1>
-        <p className="title__sub">ढोल वाजतोय · गुलाल उडतोय · गल्ली नाचतेय</p>
+        <p className="title__sub">
+          the dhol&apos;s playing · the gulaal&apos;s flying · the whole lane is dancing
+        </p>
+        <p className="title__subMr" lang="mr">
+          ढोल वाजतोय · गुलाल उडतोय · गल्ली नाचतेय
+        </p>
       </div>
 
       <Player set={set} onSetChange={setSet} onBeat={onBeat} />
 
       <p className="dhol-hint" style={{ opacity: hintSeen ? 0 : 1 }}>
-        ढोल वाजवा
+        Hit the dhol
+        <span className="dhol-hint__mr" lang="mr">ढोल वाजवा</span>
         <span className="dhol-hint__key">D</span>
       </p>
 

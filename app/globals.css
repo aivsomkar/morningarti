@@ -291,6 +291,8 @@ a {
 }
 
 /* ── Title ─────────────────────────────────────────────────── */
+/* Bilingual lockup: English leads, Marathi alongside in gold. On a phone the
+   two wrap and it becomes English over Marathi. */
 
 .title {
   position: absolute;
@@ -300,36 +302,68 @@ a {
   transform: translate(-50%, -50%);
   text-align: center;
   pointer-events: none;
-  width: min(94vw, 1100px);
+  width: min(94vw, 1240px);
 }
 
-.title__mark {
-  display: block;
+.title__lockup {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(10px, 1.5vw, 24px);
   margin: 0;
   font-family: var(--font-rozha), Georgia, serif;
-  font-size: clamp(30px, 4.6vw, 74px);
-  line-height: 0.95;
-  white-space: nowrap;
-  color: #fffaf0;
+  font-weight: 400;
+  line-height: 1.04;
   text-shadow:
     0 2px 0 rgba(74, 10, 30, 0.5),
-    0 6px 22px rgba(38, 5, 16, 0.8),
+    0 6px 22px rgba(38, 5, 16, 0.82),
     0 0 70px rgba(24, 3, 10, 0.6);
 }
 
-.title__mark span {
+.title__en {
+  font-size: clamp(26px, 3.9vw, 62px);
+  letter-spacing: 0.022em;
+  text-transform: uppercase;
+  color: #fffaf0;
+  white-space: nowrap;
+}
+
+.title__rule {
+  align-self: center;
+  width: 2px;
+  height: clamp(20px, 2.3vw, 38px);
+  background: rgba(255, 228, 154, 0.55);
+  flex: none;
+}
+
+.title__mr {
+  font-size: clamp(19px, 2.5vw, 40px);
   color: var(--gold-lit);
+  white-space: nowrap;
 }
 
 .title__sub {
-  margin: 10px 0 0;
-  font-size: clamp(10px, 1.1vw, 14px);
+  margin: 12px 0 0;
+  font-size: clamp(10px, 1.05vw, 13.5px);
   font-weight: 500;
-  letter-spacing: 0.22em;
-  color: #ffeec2;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff6e6;
   text-shadow:
     0 2px 10px rgba(38, 5, 16, 0.95),
-    0 0 30px rgba(24, 3, 10, 0.8);
+    0 0 30px rgba(24, 3, 10, 0.85);
+}
+
+.title__subMr {
+  margin: 5px 0 0;
+  font-size: clamp(10px, 1.05vw, 13.5px);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: rgba(255, 228, 154, 0.86);
+  text-shadow:
+    0 2px 10px rgba(38, 5, 16, 0.95),
+    0 0 30px rgba(24, 3, 10, 0.85);
 }
 
 /* Kept for the hand-drawn fallback's own banner cloth. */
@@ -647,6 +681,10 @@ a {
   transition: opacity 0.5s ease;
 }
 
+.dhol-hint__mr {
+  color: rgba(255, 228, 154, 0.7);
+}
+
 .dhol-hint__key {
   border: 1px solid rgba(253, 240, 220, 0.24);
   border-radius: 5px;
@@ -821,9 +859,12 @@ a {
 
 @media (max-width: 900px) {
   /* Clear of the festival chip, which sits centred at the top */
-  .title { top: 17.5%; }
-  .title__mark { white-space: normal; }
-  .title__sub { letter-spacing: 0.14em; }
+  .title { top: 19.5%; }
+  /* Wrapped onto two lines, the divider has nothing to divide */
+  .title__rule { display: none; }
+  .title__lockup { gap: 2px; }
+  .title__sub,
+  .title__subMr { letter-spacing: 0.12em; }
   .links { gap: 12px; }
   .links__item span { display: none; }
   .utsav__note { display: none; }
