@@ -632,6 +632,25 @@ a {
   color: var(--paper-faint);
 }
 
+.queue__owner {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(253, 240, 220, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue__legal {
+  margin: 0;
+  padding: 9px 12px 11px;
+  border-top: 1px solid rgba(253, 240, 220, 0.09);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--paper-faint);
+}
+
 .queue__badge {
   font-size: 9.5px;
   letter-spacing: 0.1em;
@@ -642,6 +661,73 @@ a {
   padding: 2px 8px;
   white-space: nowrap;
 }
+
+/* ── The YouTube card ──────────────────────────────────────── */
+/* Visible on purpose: the label's own player, credited and clickable. */
+
+.stage {
+  position: absolute;
+  z-index: 6;
+  left: clamp(14px, 2vw, 28px);
+  bottom: clamp(18px, 3.2vh, 36px);
+  width: clamp(180px, 17vw, 248px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.stage--hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.stage__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(240, 192, 74, 0.24);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6);
+}
+
+.stage__frame > div,
+.stage__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.stage__credit {
+  display: block;
+  margin-top: 7px;
+  line-height: 1.35;
+}
+
+.stage__owner {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--paper-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.stage__watch {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-lit);
+  opacity: 0.8;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.stage__credit:hover .stage__owner { color: var(--paper); }
+.stage__credit:hover .stage__watch { opacity: 1; }
 
 /* ── Notices ───────────────────────────────────────────────── */
 
@@ -670,9 +756,21 @@ a {
   color: var(--gold-lit);
 }
 
-.notice button {
+.notice button,
+.notice a {
   text-decoration: underline;
   color: var(--marigold-2);
+}
+
+.player__owner {
+  color: var(--paper-faint);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.player__owner:hover {
+  color: var(--gold-lit);
+  text-decoration: underline;
 }
 
 /* ── The dhol you can hit ──────────────────────────────────── */
@@ -878,6 +976,15 @@ a {
   .links { gap: 12px; }
   .links__item span { display: none; }
   .utsav__note { display: none; }
+
+  .stage {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(clamp(18px, 3.2vh, 36px) + 136px);
+    width: min(210px, 56vw);
+  }
+
+  .stage--hidden { transform: translate(-50%, 10px); }
 
   /* No drums in shot to aim at — the hint says tap, and any tap lands. */
   .dhol-hint {

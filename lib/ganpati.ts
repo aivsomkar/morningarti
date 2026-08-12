@@ -9,12 +9,20 @@
  * Sources for the DJ set: the "Ganpati Visarjan Marathi Dance Hits" and
  * "Ganpati Visarjan Dance Hits" compilations, and the Bollywood Ganpati
  * standards that every mandal plays.
+ *
+ * Every one of these songs is somebody's copyright, so nothing is hosted here.
+ * Each track points at the official upload and plays through YouTube's own
+ * embedded player: the label serves it, the label is named on screen, the play
+ * counts for them, and there's a link straight to the video. Each `yt` id was
+ * resolved by searching for the rights holder's channel and confirmed through
+ * YouTube's oEmbed endpoint, which also drops anything with embedding turned
+ * off. Four songs never resolved to an official upload and were left out
+ * rather than pointed at a re-upload.
  */
 
 export type Set = "aarti" | "dj" | "visarjan";
 
 export type Track = {
-  /** File the player looks for: /audio/{slug}.mp3 */
   slug: string;
   title: string;
   /** Singer, composer, or the film it's from. */
@@ -24,6 +32,10 @@ export type Track = {
   glyph: string;
   /** Shown as a small badge — why this one is here. */
   tag?: string;
+  /** The official upload. Empty on the synthesised pathak. */
+  yt: string;
+  /** The channel that holds the recording. Credited on screen. */
+  owner: string;
 };
 
 export const SETS: { id: Set; name: string; sub: string; note: string }[] = [
@@ -56,13 +68,17 @@ export const TRACKS: Track[] = [
     set: "aarti",
     glyph: "गं",
     tag: "पहिली",
+    yt: "gFr5p5AyuD0",
+    owner: "Rajshri Soul",
   },
   {
     slug: "shendur-lal-chadhayo",
     title: "शेंदुर लाल चढ़ायो",
-    by: "आशा भोसले",
+    by: "आशा भोसले · वास्तव",
     set: "aarti",
     glyph: "ॐ",
+    yt: "8yv5kMuk31Y",
+    owner: "T-Series Bhakti Sagar",
   },
   {
     slug: "jai-ganesh-jai-ganesh-deva",
@@ -70,6 +86,8 @@ export const TRACKS: Track[] = [
     by: "अनुराधा पौडवाल",
     set: "aarti",
     glyph: "जय",
+    yt: "L-uG5-xf3Pk",
+    owner: "T-Series Bhakti Sagar",
   },
   {
     slug: "vakratunda-mahakaya",
@@ -77,6 +95,8 @@ export const TRACKS: Track[] = [
     by: "श्लोक",
     set: "aarti",
     glyph: "श्लो",
+    yt: "qf3EdXE0c1c",
+    owner: "Rajshri Soul",
   },
   {
     slug: "ekadantaya-vakratundaya",
@@ -84,13 +104,17 @@ export const TRACKS: Track[] = [
     by: "शंकर महादेवन",
     set: "aarti",
     glyph: "ए",
+    yt: "re88S-5fpmA",
+    owner: "Times Music Spiritual",
   },
   {
     slug: "ganesha-pancharatnam",
     title: "गणेश पंचरत्नम्",
-    by: "आदि शंकराचार्य",
+    by: "एम. एस. सुब्बुलक्ष्मी",
     set: "aarti",
     glyph: "पं",
+    yt: "guZR2_MS5ec",
+    owner: "Saregama Carnatic Classical",
   },
   {
     slug: "ghalin-lotangan",
@@ -99,6 +123,8 @@ export const TRACKS: Track[] = [
     set: "aarti",
     glyph: "घा",
     tag: "शेवटची",
+    yt: "F39gANj5E7I",
+    owner: "Shemaroo Bhakti",
   },
   {
     slug: "mantrapushpanjali",
@@ -106,6 +132,8 @@ export const TRACKS: Track[] = [
     by: "वैदिक",
     set: "aarti",
     glyph: "मं",
+    yt: "silJPG8SJsY",
+    owner: "T-Series Bhakti Marathi",
   },
 
   /* ── डीजे — the street set ─────────────────────────────── */
@@ -116,13 +144,8 @@ export const TRACKS: Track[] = [
     set: "dj",
     glyph: "दे",
     tag: "अँथम",
-  },
-  {
-    slug: "ganpati-bappa-morya-agneepath",
-    title: "गणपती बाप्पा मोरया",
-    by: "अजय गोगावले · अग्निपथ",
-    set: "dj",
-    glyph: "मो",
+    yt: "RYqJ5w-GrfM",
+    owner: "Sony Music India",
   },
   {
     slug: "morya-re",
@@ -130,6 +153,8 @@ export const TRACKS: Track[] = [
     by: "शंकर महादेवन · डॉन",
     set: "dj",
     glyph: "रे",
+    yt: "8jff2wz3Hpk",
+    owner: "T-Series",
   },
   {
     slug: "gajanana",
@@ -137,13 +162,17 @@ export const TRACKS: Track[] = [
     by: "सुखविंदर सिंग · बाजीराव मस्तानी",
     set: "dj",
     glyph: "गज",
+    yt: "wGkcQmzysu0",
+    owner: "Sony Music India",
   },
   {
     slug: "ganaraj-rangi-nachto",
     title: "गणराज रंगी नाचतो",
-    by: "मराठी भक्तिगीत",
+    by: "लता मंगेशकर · मराठी भक्तिगीत",
     set: "dj",
     glyph: "रं",
+    yt: "_MPNLI1NDHM",
+    owner: "Saregama Marathi",
   },
   {
     slug: "zingaat",
@@ -152,27 +181,35 @@ export const TRACKS: Track[] = [
     set: "dj",
     glyph: "झि",
     tag: "गल्ली",
+    yt: "5AeX7Ddq4ts",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "dolby-walya",
     title: "डॉल्बी वाल्या",
-    by: "नागेश मोरवेकर · जाऊ द्या ना बाळासाहेब",
+    by: "अजय-अतुल · जाऊ द्या ना बाळासाहेब",
     set: "dj",
     glyph: "डॉ",
+    yt: "Z6U3tVjHcUI",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "baby-bring-it-on",
-    title: "बेबी ब्रिंग इट ऑन",
+    title: "ब्रिंग इट ऑन",
     by: "जाऊ द्या ना बाळासाहेब",
     set: "dj",
     glyph: "ब्रि",
+    yt: "zkt7DfOUlyM",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "naad-kara",
     title: "नाद करा",
-    by: "आदर्श शिंदे · आनंद शिंदे",
+    by: "धुरळा",
     set: "dj",
     glyph: "ना",
+    yt: "frlrCKAxatA",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "wajle-ki-bara",
@@ -180,6 +217,8 @@ export const TRACKS: Track[] = [
     by: "बेला शेंडे · नटरंग",
     set: "dj",
     glyph: "वा",
+    yt: "7R7QJkznJGU",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "apsara-aali",
@@ -187,6 +226,8 @@ export const TRACKS: Track[] = [
     by: "बेला शेंडे · नटरंग",
     set: "dj",
     glyph: "अ",
+    yt: "mW67u_hWiSo",
+    owner: "Zee Music Marathi",
   },
   {
     slug: "hey-ganaraya",
@@ -194,6 +235,8 @@ export const TRACKS: Track[] = [
     by: "दिव्य कुमार · ABCD 2",
     set: "dj",
     glyph: "हे",
+    yt: "v10jDT7SJsw",
+    owner: "Zee Music Company",
   },
   {
     slug: "sadda-dil-vi-tu",
@@ -201,58 +244,56 @@ export const TRACKS: Track[] = [
     by: "ABCD · ग ग गणपती",
     set: "dj",
     glyph: "ग",
-  },
-  {
-    slug: "raja-lalbaugcha",
-    title: "राजा लालबागचा",
-    by: "आदर्श शिंदे",
-    set: "dj",
-    glyph: "रा",
-  },
-  {
-    slug: "morya-bola",
-    title: "मोरया बोला",
-    by: "आनंद शिंदे",
-    set: "dj",
-    glyph: "बो",
-  },
-  {
-    slug: "bappa-banjo",
-    title: "बाप्पा",
-    by: "बँजो · रितेश देशमुख",
-    set: "dj",
-    glyph: "बा",
+    yt: "ILnYRHmvJOI",
+    owner: "Sony Music India",
   },
 
   /* ── विसर्जन ───────────────────────────────────────────── */
   {
-    slug: "ganpati-gele-gavala",
-    title: "गणपती गेले गावाला",
-    by: "पारंपरिक",
+    slug: "bappa-morya-re",
+    title: "बाप्पा मोरया रे",
+    by: "आनंद शिंदे",
     set: "visarjan",
-    glyph: "गे",
+    glyph: "मो",
     tag: "निरोप",
+    yt: "n6MSNAIEBhI",
+    owner: "Saregama Marathi",
+  },
+  {
+    slug: "nirop-gheto-deva",
+    title: "निरोप घेतो देवा",
+    by: "विसर्जन गीत",
+    set: "visarjan",
+    glyph: "नि",
+    yt: "pNWelwjPCcI",
+    owner: "Ultra Devotional Marathi",
   },
   {
     slug: "pudchya-varshi-lavkar-ya",
     title: "पुढच्या वर्षी लवकर या",
-    by: "जयघोष",
+    by: "सोडून जाता तुम्ही हो देवा",
     set: "visarjan",
     glyph: "पु",
+    yt: "9klUCwy7UJE",
+    owner: "T-Series Bhakti Marathi",
   },
   {
-    slug: "bappa-morya-re",
-    title: "बाप्पा मोरया रे",
-    by: "विसर्जन मिरवणूक",
+    slug: "ganpati-apne-gaon-chale",
+    title: "गणपती अपने गाँव चले",
+    by: "अग्निपथ · १९९० ",
     set: "visarjan",
-    glyph: "मो",
+    glyph: "गा",
+    yt: "zbL7wLkh-E8",
+    owner: "Tips Official",
   },
   {
     slug: "aali-swari-undaravari",
     title: "आली स्वारी उंदरावरी",
-    by: "आनंद शिंदे · हर्षद शिंदे",
+    by: "आनंद शिंदे",
     set: "visarjan",
     glyph: "स्वा",
+    yt: "tlSHX840McM",
+    owner: "T-Series Bhakti Sagar",
   },
   {
     slug: "gauri-gajanan-pujuya-chala",
@@ -260,6 +301,8 @@ export const TRACKS: Track[] = [
     by: "मिलिंद शिंदे",
     set: "visarjan",
     glyph: "गौ",
+    yt: "vl2TWDnFf54",
+    owner: "T-Series Marathi",
   },
 ];
 

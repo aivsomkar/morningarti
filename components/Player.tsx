@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SETS, tracksIn, type Set, type Track } from "@/lib/ganpati";
 import { Pathak } from "@/lib/sound";
+import YouTubeStage, { type Stage } from "./YouTubeStage";
 
 /**
- * The pathak is the first thing in every set because it's the one thing that
- * always works — it's generated in the browser, not fetched.
+ * The pathak is first in every set because it's the one thing that isn't
+ * anybody's property — it's built from oscillators in the browser. Everything
+ * under it is somebody's record, and plays from their own YouTube upload.
  */
 const PATHAK: Track = {
   slug: "__pathak",
@@ -15,6 +17,8 @@ const PATHAK: Track = {
   set: "dj",
   glyph: "ढ",
   tag: "लाइव",
+  yt: "",
+  owner: "synthesised in your browser",
 };
 
 function clock(s: number) {
@@ -36,17 +40,16 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
   const [playing, setPlaying] = useState(false);
   const [pos, setPos] = useState(0);
   const [dur, setDur] = useState(0);
-  const [missing, setMissing] = useState<Track | null>(null);
+  const [blocked, setBlocked] = useState<Track | null>(null);
   const [open, setOpen] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const pathakRef = useRef<Pathak | null>(null);
+  const stageRef = useRef<Stage | null>(null);
 
   const queue = useMemo(() => [PATHAK, ...tracksIn(set)], [set]);
   const track = queue[Math.min(idx, queue.length - 1)];
   const isPathak = track.slug === PATHAK.slug;
 
-  // Built once, in an effect — never during render.
   useEffect(() => {
     const p = new Pathak();
     pathakRef.current = p;
@@ -62,29 +65,21 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
 
   const stopEverything = useCallback(() => {
     pathakRef.current?.stop();
-    const el = audioRef.current;
-    if (el) {
-      el.pause();
-      el.currentTime = 0;
-    }
+    stageRef.current?.pause();
   }, []);
 
   const start = useCallback(() => {
-    setMissing(null);
+    setBlocked(null);
     if (isPathak) {
-      audioRef.current?.pause();
+      stageRef.current?.pause();
       pathakRef.current?.start();
       setPlaying(true);
       return;
     }
     pathakRef.current?.stop();
-    const el = audioRef.current;
-    if (!el) return;
-    void el.play().then(
-      () => setPlaying(true),
-      () => setPlaying(false),
-    );
-  }, [isPathak]);
+    stageRef.current?.play(track.yt);
+    setPlaying(true);
+  }, [isPathak, track.yt]);
 
   const toggle = useCallback(() => {
     if (playing) {
@@ -98,21 +93,40 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
   const go = useCallback(
     (next: number) => {
       const n = (next + queue.length) % queue.length;
-      stopEverything();
+      const to = queue[n];
       setPos(0);
       setDur(0);
-      setMissing(null);
+      setBlocked(null);
       setIdx(n);
+
+      if (to.slug === PATHAK.slug) {
+        stageRef.current?.pause();
+        if (playing) pathakRef.current?.start();
+      } else {
+        pathakRef.current?.stop();
+        if (playing) stageRef.current?.play(to.yt);
+      }
     },
-    [queue.length, stopEverything],
+    [queue, playing],
   );
 
   const pick = useCallback(
     (n: number) => {
-      go(n);
-      window.setTimeout(() => setPlaying(true), 0);
+      const to = queue[(n + queue.length) % queue.length];
+      setPos(0);
+      setDur(0);
+      setBlocked(null);
+      setIdx((n + queue.length) % queue.length);
+      setPlaying(true);
+      if (to.slug === PATHAK.slug) {
+        stageRef.current?.pause();
+        pathakRef.current?.start();
+      } else {
+        pathakRef.current?.stop();
+        stageRef.current?.play(to.yt);
+      }
     },
-    [go],
+    [queue],
   );
 
   const switchSet = useCallback(
@@ -123,35 +137,17 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
       setIdx(0);
       setPos(0);
       setDur(0);
-      setMissing(null);
+      setBlocked(null);
+      setPlaying(false);
     },
     [set, onSetChange, stopEverything],
   );
 
-  // Load whatever is selected; play it if we were already playing.
-  useEffect(() => {
-    const el = audioRef.current;
-    if (isPathak) {
-      el?.pause();
-      if (playing) pathakRef.current?.start();
-      else pathakRef.current?.stop();
-      return;
-    }
-    pathakRef.current?.stop();
-    if (!el) return;
-    el.src = `/audio/${track.slug}.mp3`;
-    el.load();
-    if (playing) void el.play().catch(() => setPlaying(false));
-    // `playing` is read but not depended on, so the transport doesn't reload
-    // the source every time it toggles.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, set, isPathak, track.slug]);
-
-  useEffect(() => {
-    if (!playing || isPathak) return;
-    const el = audioRef.current;
-    if (el && el.paused) void el.play().catch(() => setPlaying(false));
-  }, [playing, isPathak]);
+  /** A label can turn embedding off after the fact. Say so, and move on. */
+  const onBlockedTrack = useCallback(() => {
+    setBlocked(track);
+    setPlaying(false);
+  }, [track]);
 
   // Media keys and the lock screen.
   useEffect(() => {
@@ -176,30 +172,39 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        preload="none"
-        onTimeUpdate={(e) => setPos(e.currentTarget.currentTime)}
-        onDurationChange={(e) => setDur(e.currentTarget.duration)}
+      <YouTubeStage
+        videoId={isPathak ? null : track.yt}
+        title={track.title}
+        owner={track.owner}
+        visible={!isPathak && playing}
+        onReady={(s) => {
+          stageRef.current = s;
+        }}
         onEnded={() => go(idx + 1)}
-        onError={() => {
-          if (isPathak) return;
-          setMissing(track);
-          setPlaying(false);
+        onBlocked={onBlockedTrack}
+        onProgress={(p, d) => {
+          setPos(p);
+          setDur(d);
         }}
       />
 
-      {missing && (
+      {blocked && (
         <div className="notice" role="status">
-          <b>{missing.title}</b> isn&apos;t in this copy — the recordings are
-          somebody&apos;s copyright, so none ship with the repo. Drop an mp3 at{" "}
-          <code>public/audio/{missing.slug}.mp3</code> and it plays here. Meanwhile{" "}
-          <button onClick={() => pick(0)}>ढोल ताशा पथक</button> is live, and the links
-          up top open a real playlist.
+          <b>{blocked.title}</b> — {blocked.owner} has embedding turned off for this
+          one, so it can only play on YouTube.{" "}
+          <a
+            href={`https://www.youtube.com/watch?v=${blocked.yt}`}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Open it there ↗
+          </a>{" "}
+          or{" "}
+          <button onClick={() => pick(idx + 1)}>skip to the next one</button>.
         </div>
       )}
 
-      {open && !missing && (
+      {open && !blocked && (
         <div className="queue">
           <div className="queue__tabs" role="tablist" aria-label="Sets">
             {SETS.map((s) => (
@@ -230,11 +235,16 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
                 <span>
                   <span className="queue__name">{t.title}</span>
                   <span className="queue__for"> · {t.by}</span>
+                  <span className="queue__owner">{t.owner}</span>
                 </span>
                 {t.tag ? <span className="queue__badge">{t.tag}</span> : <span />}
               </button>
             ))}
           </div>
+          <p className="queue__legal">
+            Nothing is hosted here. Every song streams from its owner&apos;s own
+            YouTube upload, credited above — the play counts for them.
+          </p>
         </div>
       )}
 
@@ -250,7 +260,22 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
 
         <div className="player__meta">
           <div className="player__name">{track.title}</div>
-          <div className="player__by">{track.by}</div>
+          <div className="player__by">
+            {track.by}
+            {!isPathak && (
+              <>
+                {" · "}
+                <a
+                  className="player__owner"
+                  href={`https://www.youtube.com/watch?v=${track.yt}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {track.owner} ↗
+                </a>
+              </>
+            )}
+          </div>
           <div className="player__scrub">
             <span className="player__time">{isPathak ? "live" : clock(pos)}</span>
             <div className="player__bar">

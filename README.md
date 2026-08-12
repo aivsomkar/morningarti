@@ -40,12 +40,29 @@ npm install
 npm run dev
 ```
 
-## Adding the songs
+## The music, and who owns it
 
-None ship with the repo — see [`public/audio/README.md`](public/audio/README.md).
-Drop mp3s named after the slugs in `lib/ganpati.ts` and the player finds them.
-Until then the live pathak covers it, and the links in the top right open a real
-playlist.
+Every song here is somebody's copyright. Nothing is hosted, nothing is ripped,
+and there are no mp3s in the repo. Each track points at the **official upload**
+and plays through YouTube's own embedded player, which means:
+
+- the label streams it, not us
+- the label is named on screen, next to the video and in every queue row
+- the play counts on their video
+- the card links straight to the video, so the traffic goes to them
+
+The owners are the actual rights holders — Sony Music India, Zee Music Marathi,
+T-Series, Saregama, Shemaroo, Times Music, Tips, Rajshri, Ultra. Each `yt` id in
+`lib/ganpati.ts` was found by searching for the rights holder's channel and then
+confirmed through YouTube's oEmbed endpoint, which also drops anything with
+embedding switched off. Four songs never resolved to an official upload and were
+left out rather than pointed at a re-upload.
+
+If a label turns embedding off later, the player says so, credits them, offers a
+link to watch it on YouTube, and moves to the next track.
+
+The one thing that *is* ours is **ढोल ताशा पथक** — dhol, tasha and jhanj built
+from oscillators in the browser, first in every set, owned by nobody.
 
 ## Layout
 
@@ -59,8 +76,9 @@ components/
   Scene.tsx       the whole pandal, in SVG
   Chrome.tsx      clock, festival chip, outbound links
   Player.tsx      transport, the three-set queue, missing-file handling
+  YouTubeStage.tsx  the embedded player, and the credit that links to it
 lib/
-  ganpati.ts      tracklist, sets, festival calendar
+  ganpati.ts      tracklist with owners + video ids, sets, festival calendar
   sound.ts        dhol, tasha, jhanj, and the pathak scheduler
 ```
 
