@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Rozha_One, Mukta } from "next/font/google";
+import { Baloo_2, Mukta } from "next/font/google";
 import "./globals.css";
 
-// Rozha One: high-contrast Devanagari display — the weight of a mandal banner.
-const rozha = Rozha_One({
-  weight: "400",
+// Baloo 2: heavy, monolinear, slightly rounded — the Devanagari a signpainter
+// puts on a shop board, which is what a mandal banner is.
+const display = Baloo_2({
+  weight: ["700", "800"],
   subsets: ["devanagari", "latin"],
-  variable: "--font-rozha",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -30,14 +31,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0819",
+  themeColor: "#150913",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="mr">
-      <body className={`${rozha.variable} ${mukta.variable}`}>{children}</body>
+      <body className={`${display.variable} ${mukta.variable}`}>{children}</body>
     </html>
   );
 }

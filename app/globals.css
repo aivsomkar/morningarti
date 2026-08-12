@@ -54,6 +54,9 @@
   --paper-dim: rgba(253, 240, 220, 0.66);
   --paper-faint: rgba(253, 240, 220, 0.36);
 
+  /* The surround the pandal card sits on */
+  --mount: #150913;
+
   /* Turned up while the dhol is going. */
   --beat: 0;
 }
@@ -72,7 +75,7 @@ body {
 }
 
 body {
-  background: var(--ink);
+  background: var(--mount);
   color: var(--paper);
   font-family: var(--font-mukta), system-ui, sans-serif;
   font-size: 16px;
@@ -102,10 +105,16 @@ a {
 
 /* ── Stage ─────────────────────────────────────────────────── */
 
+/* The whole scene is a card on a mount, so everything in it — plate, chrome,
+   player — is clipped by the same radius. */
 .pandal {
   position: fixed;
-  inset: 0;
+  inset: clamp(8px, 1.1vw, 18px);
+  border-radius: clamp(14px, 1.5vw, 26px);
   overflow: hidden;
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 228, 154, 0.13);
 }
 
 .pandal__art {
@@ -120,6 +129,7 @@ a {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
   background:
     radial-gradient(72% 52% at 50% 44%, rgba(255, 196, 96, calc(0.14 * var(--beat))), transparent 62%),
     linear-gradient(
@@ -312,8 +322,8 @@ a {
   flex-wrap: wrap;
   gap: clamp(10px, 1.5vw, 24px);
   margin: 0;
-  font-family: var(--font-rozha), Georgia, serif;
-  font-weight: 400;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 800;
   line-height: 1.04;
   text-shadow:
     0 2px 0 rgba(74, 10, 30, 0.5),
@@ -419,7 +429,7 @@ a {
 .player__art--visarjan { background: radial-gradient(circle at 50% 30%, #6fd3ff, #14407a 82%); }
 
 .player__glyph {
-  font-family: var(--font-rozha), serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 26px;
   line-height: 1;
   color: #fff6e2;
