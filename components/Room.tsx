@@ -9,8 +9,8 @@ import { dhol, jhanj } from "@/lib/sound";
 
 const GULAAL = ["var(--gulaal-1)", "var(--gulaal-2)", "var(--gulaal-3)", "var(--gulaal-4)"];
 
-/** Where the dhol sits in scene coordinates — bursts come off it. */
-const DHOL = { x: 1268, y: 948 };
+/** Where the dhol sits, as a fraction of the artwork — bursts come off it. */
+const DHOL = { x: 0.297, y: 0.915 };
 
 export default function Room() {
   // Rendered on the server too, so it must not read the clock until mounted.
@@ -48,13 +48,14 @@ export default function Room() {
     const made: Burst[] = Array.from({ length: count }, () => {
       const id = ++burstId.current;
       const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.7;
-      const dist = 90 + Math.random() * 200;
+      const dist = 0.07 + Math.random() * 0.15;
       return {
         id,
-        x: DHOL.x - 60 + Math.random() * 120,
-        y: DHOL.y - 190 + Math.random() * 60,
+        x: DHOL.x + (Math.random() - 0.5) * 0.07,
+        y: DHOL.y + (Math.random() - 0.5) * 0.04,
         dx: Math.cos(angle) * dist,
-        dy: Math.sin(angle) * dist,
+        // The y fraction is of height, so stretch it to travel as far visually.
+        dy: Math.sin(angle) * dist * 1.75,
         c: GULAAL[Math.floor(Math.random() * GULAAL.length)],
       };
     });
@@ -109,7 +110,12 @@ export default function Room() {
 
       <Chrome now={now} utsav={utsav} />
 
-      <h1 className="sr-only">गणपती बाप्पा मोरया — ढोल वाजतोय, गुलाल उडतोय, गल्ली नाचतेय</h1>
+      <div className="title">
+        <h1 className="title__mark">
+          गणपती बाप्पा <span>मोरया</span>
+        </h1>
+        <p className="title__sub">ढोल वाजतोय · गुलाल उडतोय · गल्ली नाचतेय</p>
+      </div>
 
       <Player set={set} onSetChange={setSet} onBeat={onBeat} />
 

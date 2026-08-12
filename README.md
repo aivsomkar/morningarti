@@ -8,11 +8,13 @@ scene, a floating player, and nothing else.
 
 ## What's in it
 
-**The pandal is drawn, not photographed.** `components/Scene.tsx` is one
-1600×900 SVG: the night lane, serial lights, the drape and its gold arch, a
-seated Ganpati with four arms and a curling trunk, the stage, and a crowd of
-around forty silhouettes built from a handful of poses. No images, no sprites,
-no external assets.
+**A painted plate with a live layer on top.** `public/pandal.jpg` is the scene;
+`components/Scene.tsx` puts a thin SVG over it whose viewBox is the image's own
+pixel size, sliced exactly the way `object-fit: cover` does — so the drum
+hit-areas and the gulaal stay glued to the painting at every viewport,
+portrait included. If the plate is ever missing, `components/SceneDrawn.tsx`
+stands in: the whole pandal hand-drawn as one 1600×900 SVG, idol and crowd
+included.
 
 **Three sets, not one playlist.** A pandal doesn't run a single queue. Mornings
 and evenings are the aarti, sung in a fixed order that ends the same way every
