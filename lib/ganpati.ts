@@ -59,6 +59,21 @@ export const SETS: { id: Set; name: string; sub: string; note: string }[] = [
   },
 ];
 
+/**
+ * Prepended to every set. A pathak is how a pandal actually opens — before any
+ * song, there's the dhol coming up the lane.
+ */
+export const OPENER: Track = {
+  slug: "nashik-dhol",
+  title: "नाशिक ढोल",
+  by: "ढोल ताशा पथक · original sound",
+  set: "dj",
+  glyph: "ढ",
+  tag: "पथक",
+  yt: "6fAC3LEwKC4",
+  owner: "NS Music - मराठी गाणी",
+};
+
 export const TRACKS: Track[] = [
   /* ── आरती, in sequence ─────────────────────────────────── */
   {

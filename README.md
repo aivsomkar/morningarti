@@ -22,11 +22,12 @@ night. The rest of the day the speakers belong to the street. The last day is
 a goodbye. `lib/ganpati.ts` encodes all three, and the tab that opens is picked
 from the actual hour and the actual day of the festival.
 
-**The percussion is synthesised.** `lib/sound.ts` builds a dhol (pitched
-membrane dropping a fifth in 60ms, plus a filtered noise slap), a tasha, and
-jhanj out of oscillators, then runs them on a 16-step cycle scheduled against
-the Web Audio clock so it doesn't drift. That's why the site has sound with no
-audio files in the repo. Hit the dhol in the crowd — or press <kbd>D</kbd>.
+**The dhol you hit is synthesised.** `lib/sound.ts` builds a dhol (pitched
+membrane dropping a fifth in 60ms, plus a filtered noise slap), a tasha and
+jhanj out of oscillators. Strike the drum in the crowd, or press <kbd>D</kbd>:
+it thumps, the plate shakes, and gulaal comes off the drum head. A one-shot is
+what oscillators are good at — a full looping pathak sounded synthetic next to
+a real one, so the queue opens with a recording instead.
 
 **The festival calendar is real.** Ganesh Chaturthi moves with the lunar
 calendar, so `CHATURTHI` in `lib/ganpati.ts` is a lookup table, 2024–2030. The
@@ -61,8 +62,9 @@ left out rather than pointed at a re-upload.
 If a label turns embedding off later, the player says so, credits them, offers a
 link to watch it on YouTube, and moves to the next track.
 
-The one thing that *is* ours is **ढोल ताशा पथक** — dhol, tasha and jhanj built
-from oscillators in the browser, first in every set, owned by nobody.
+Every set opens with **नाशिक ढोल** — a recorded pathak, because that's how a
+pandal actually starts. The only sound the site makes itself is the single dhol
+hit when you strike the drum in the crowd.
 
 ## Layout
 

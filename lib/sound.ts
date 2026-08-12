@@ -1,15 +1,17 @@
 /**
- * The pathak, synthesised.
+ * The drum you hit, synthesised.
  *
- * No audio files ship with this repo, so the percussion is built from
- * oscillators and noise at runtime:
+ * The music comes from YouTube; this is only the percussion the page plays
+ * itself, when you strike the dhol in the crowd:
  *
  *   dhol()   — the two-headed drum. Low head is a pitched membrane that drops
  *              a fifth in 60ms; high head is a filtered noise slap.
  *   tasha()  — the tight, high drum played with thin sticks.
  *   jhanj()  — the cymbals, on the count.
- *   Pathak   — all three on a 16-step cycle, scheduled against the audio
- *              clock rather than setInterval, so it doesn't drift.
+ *
+ * A one-shot is what oscillators are genuinely good at. There used to be a
+ * scheduler here looping all three as a full pathak; it sounded synthetic
+ * next to the real thing, so the queue opens with a recorded one instead.
  *
  * Nothing is constructed until the first gesture; browsers won't allow it.
  */
@@ -226,71 +228,4 @@ export function jhanj(opts: { gain?: number; when?: number } = {}) {
   n.connect(hp).connect(g).connect(out);
   n.start(t);
   n.stop(t + 0.45);
-}
-
-/* ── The pathak ────────────────────────────────────────────── */
-
-// One 16-step cycle of eighth notes. Read down a column for the hit.
-const BASS  = [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0];
-const SLAP  = [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1];
-const TASHA = [1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1];
-const JHANJ = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
-
-export class Pathak {
-  private a: Ctx | null = null;
-  private timer: number | null = null;
-  private step = 0;
-  private nextAt = 0;
-  private bpm = 108;
-  private running = false;
-  /** Called on every downbeat so the scene can jump with it. */
-  onBeat: ((accent: boolean) => void) | null = null;
-
-  get playing() {
-    return this.running;
-  }
-
-  start() {
-    if (this.running) return;
-    const a = audio();
-    if (!a) return;
-    this.a = a;
-    this.running = true;
-    this.step = 0;
-    this.nextAt = a.ctx.currentTime + 0.12;
-    this.timer = window.setInterval(() => this.schedule(), 25);
-  }
-
-  stop() {
-    this.running = false;
-    if (this.timer !== null) window.clearInterval(this.timer);
-    this.timer = null;
-  }
-
-  /** Look ahead 200ms and book everything that falls inside it. */
-  private schedule() {
-    if (!this.a || !this.running) return;
-    const ac = this.a.ctx;
-    const stepDur = 60 / this.bpm / 2;
-
-    while (this.nextAt < ac.currentTime + 0.2) {
-      const s = this.step % 16;
-      const accent = s === 0 || s === 8;
-      const t = this.nextAt;
-
-      if (BASS[s]) dhol({ when: t, gain: accent ? 1 : 0.78 });
-      if (SLAP[s]) dholSlap({ when: t, gain: 0.9 });
-      if (TASHA[s]) tasha({ when: t, gain: s % 2 === 0 ? 0.95 : 0.55 });
-      if (JHANJ[s]) jhanj({ when: t, gain: accent ? 1 : 0.6 });
-
-      if (BASS[s] && this.onBeat) {
-        const delay = Math.max(0, (t - ac.currentTime) * 1000);
-        const isAccent = accent;
-        window.setTimeout(() => this.onBeat?.(isAccent), delay);
-      }
-
-      this.nextAt += stepDur;
-      this.step++;
-    }
-  }
 }

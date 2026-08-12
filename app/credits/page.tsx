@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { SETS, TRACKS, tracksIn } from "@/lib/ganpati";
+import { OPENER, SETS, TRACKS, tracksIn } from "@/lib/ganpati";
 
 /**
  * Who owns what, and how to get something taken down.
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default function CreditsPage() {
-  const owners = [...new Set(TRACKS.map((t) => t.owner))].sort();
+  const owners = [...new Set([OPENER, ...TRACKS].map((t) => t.owner))].sort();
 
   return (
     <main className="doc">
@@ -51,9 +51,28 @@ export default function CreditsPage() {
         rather than pointed at a re-upload.
       </p>
       <p>
-        The one exception is <b>ढोल ताशा पथक</b>, the dhol-tasha loop that opens every
-        set. That is generated in your browser from oscillators. Nobody owns it.
+        The only sound this site makes on its own is the dhol you can strike in the
+        crowd — a single hit, built from oscillators. Everything you can play is
+        somebody&apos;s recording.
       </p>
+
+      <h3>
+        Opens every set <span className="doc__sub">पथक</span>
+      </h3>
+      <ul className="doc__list">
+        <li>
+          <a
+            href={`https://www.youtube.com/watch?v=${OPENER.yt}`}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            {OPENER.title}
+          </a>
+          <span className="doc__by">
+            {OPENER.by} — © {OPENER.owner}
+          </span>
+        </li>
+      </ul>
 
       <h2>Rights holders</h2>
       <p className="doc__owners">{owners.join(" · ")}</p>

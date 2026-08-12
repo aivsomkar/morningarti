@@ -1,25 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SETS, tracksIn, type Set, type Track } from "@/lib/ganpati";
-import { Pathak } from "@/lib/sound";
+import { OPENER, SETS, tracksIn, type Set, type Track } from "@/lib/ganpati";
 import YouTubeStage, { type Stage } from "./YouTubeStage";
 
-/**
- * The pathak is first in every set because it's the one thing that isn't
- * anybody's property — it's built from oscillators in the browser. Everything
- * under it is somebody's record, and plays from their own YouTube upload.
- */
-const PATHAK: Track = {
-  slug: "__pathak",
-  title: "ढोल ताशा पथक",
-  by: "लाइव · ढोल, ताशा, झांज",
-  set: "dj",
-  glyph: "ढ",
-  tag: "लाइव",
-  yt: "",
-  owner: "synthesised in your browser",
-};
+/** Roughly a pathak's tempo — what the crowd bounces to while anything plays. */
+const BOUNCE_MS = 600;
 
 function clock(s: number) {
   if (!Number.isFinite(s) || s < 0) s = 0;
@@ -43,43 +29,29 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
   const [blocked, setBlocked] = useState<Track | null>(null);
   const [open, setOpen] = useState(false);
 
-  const pathakRef = useRef<Pathak | null>(null);
   const stageRef = useRef<Stage | null>(null);
 
-  const queue = useMemo(() => [PATHAK, ...tracksIn(set)], [set]);
+  const queue = useMemo(() => [OPENER, ...tracksIn(set)], [set]);
   const track = queue[Math.min(idx, queue.length - 1)];
-  const isPathak = track.slug === PATHAK.slug;
 
+  // Nothing here reports its beat, so the crowd keeps a steady one of its own
+  // for as long as something is playing.
   useEffect(() => {
-    const p = new Pathak();
-    pathakRef.current = p;
-    return () => {
-      p.stop();
-      pathakRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (pathakRef.current) pathakRef.current.onBeat = onBeat;
-  }, [onBeat]);
+    if (!playing) return;
+    let n = 0;
+    const t = window.setInterval(() => onBeat(n++ % 4 === 0), BOUNCE_MS);
+    return () => window.clearInterval(t);
+  }, [playing, onBeat]);
 
   const stopEverything = useCallback(() => {
-    pathakRef.current?.stop();
     stageRef.current?.pause();
   }, []);
 
   const start = useCallback(() => {
     setBlocked(null);
-    if (isPathak) {
-      stageRef.current?.pause();
-      pathakRef.current?.start();
-      setPlaying(true);
-      return;
-    }
-    pathakRef.current?.stop();
     stageRef.current?.play(track.yt);
     setPlaying(true);
-  }, [isPathak, track.yt]);
+  }, [track.yt]);
 
   const toggle = useCallback(() => {
     if (playing) {
@@ -93,38 +65,24 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
   const go = useCallback(
     (next: number) => {
       const n = (next + queue.length) % queue.length;
-      const to = queue[n];
       setPos(0);
       setDur(0);
       setBlocked(null);
       setIdx(n);
-
-      if (to.slug === PATHAK.slug) {
-        stageRef.current?.pause();
-        if (playing) pathakRef.current?.start();
-      } else {
-        pathakRef.current?.stop();
-        if (playing) stageRef.current?.play(to.yt);
-      }
+      if (playing) stageRef.current?.play(queue[n].yt);
     },
     [queue, playing],
   );
 
   const pick = useCallback(
     (n: number) => {
-      const to = queue[(n + queue.length) % queue.length];
+      const i = (n + queue.length) % queue.length;
       setPos(0);
       setDur(0);
       setBlocked(null);
-      setIdx((n + queue.length) % queue.length);
+      setIdx(i);
       setPlaying(true);
-      if (to.slug === PATHAK.slug) {
-        stageRef.current?.pause();
-        pathakRef.current?.start();
-      } else {
-        pathakRef.current?.stop();
-        stageRef.current?.play(to.yt);
-      }
+      stageRef.current?.play(queue[i].yt);
     },
     [queue],
   );
@@ -167,16 +125,16 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
   }, [track, idx, go, start, stopEverything]);
 
   const pct = dur > 0 ? Math.min(100, (pos / dur) * 100) : 0;
-  const artTone = isPathak ? "dj" : track.set;
+  const artTone = track.set;
   const setMeta = SETS.find((s) => s.id === set)!;
 
   return (
     <>
       <YouTubeStage
-        videoId={isPathak ? null : track.yt}
+        videoId={track.yt}
         title={track.title}
         owner={track.owner}
-        visible={!isPathak && playing}
+        visible={playing}
         onReady={(s) => {
           stageRef.current = s;
         }}
@@ -263,29 +221,25 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
           <div className="player__name">{track.title}</div>
           <div className="player__by">
             {track.by}
-            {!isPathak && (
-              <>
-                {" · "}
-                <a
-                  className="player__owner"
-                  href={`https://www.youtube.com/watch?v=${track.yt}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {track.owner} ↗
-                </a>
-              </>
-            )}
+            {" · "}
+            <a
+              className="player__owner"
+              href={`https://www.youtube.com/watch?v=${track.yt}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {track.owner} ↗
+            </a>
           </div>
           <div className="player__scrub">
-            <span className="player__time">{isPathak ? "live" : clock(pos)}</span>
+            <span className="player__time">{clock(pos)}</span>
             <div className="player__bar">
               <div
                 className="player__fill"
-                style={{ width: isPathak ? (playing ? "100%" : "0%") : `${pct}%` }}
+                style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="player__time">{isPathak ? "∞" : clock(dur)}</span>
+            <span className="player__time">{clock(dur)}</span>
           </div>
         </div>
 
