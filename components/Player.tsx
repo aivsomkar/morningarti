@@ -243,7 +243,8 @@ export default function Player({ set, onSetChange, onBeat }: Props) {
           </div>
           <p className="queue__legal">
             Nothing is hosted here. Every song streams from its owner&apos;s own
-            YouTube upload, credited above — the play counts for them.
+            YouTube upload, credited above — the play counts for them.{" "}
+            <a href="/credits">Credits &amp; rights →</a>
           </p>
         </div>
       )}
